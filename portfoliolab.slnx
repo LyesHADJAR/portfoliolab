@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="PortfolioLab.Api/PortfolioLab.Api.csproj" />
+  <Project Path="PortfolioLab.Domain.Tests/PortfolioLab.Domain.Tests.csproj" />
+  <Project Path="PortfolioLab.Domain/PortfolioLab.Domain.csproj" />
+</Solution>
