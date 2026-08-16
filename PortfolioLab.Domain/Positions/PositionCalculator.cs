@@ -1,4 +1,5 @@
 ﻿using PortfolioLab.Domain.Trades;
+using System.Security;
 
 namespace PortfolioLab.Domain.Positions;
 
@@ -14,11 +15,24 @@ public sealed class PositionCalculator
         {
             decimal totalQuantity = 0m;
             decimal totalCost = 0m;
+            decimal realizedProfitLoss = 0m;
 
             foreach(Trade trade in group)
             {
-                totalQuantity += trade.Quantity;
-                totalCost += trade.Quantity * trade.UnitPrice;
+                if (trade.Side == TradeSide.Buy)
+                {
+                    totalQuantity += trade.Quantity;
+                    totalCost += trade.Quantity * trade.UnitPrice;
+                }
+                else if (trade.Side == TradeSide.Sell)
+                {
+                    decimal currentAverageCost = totalCost / totalQuantity;
+                    realizedProfitLoss += (trade.UnitPrice - currentAverageCost) * trade.Quantity;
+                    totalQuantity -= trade.Quantity;
+                    totalCost -= trade.Quantity * currentAverageCost;
+
+                }
+
             }
 
             decimal averageCost = totalCost / totalQuantity;
@@ -28,7 +42,7 @@ public sealed class PositionCalculator
                 InstrumentId = group.Key,
                 Quantity = totalQuantity,
                 AverageCost = averageCost,
-                RealizedProfitLoss = 0m
+                RealizedProfitLoss = realizedProfitLoss
             };
             positions.Add(position);
         }
