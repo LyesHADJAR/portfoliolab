@@ -6,25 +6,34 @@ public sealed class PositionCalculator
 {
     public IReadOnlyCollection<Position> CalculatePositions(List<Trade> trades)
     {
-        decimal totalQuantity = 0m;
-        decimal totalCost = 0m;
+        List<Position> positions = new List<Position>();
 
-        foreach(Trade currentTrade in trades)
+        var groupedTrades = trades.GroupBy(trade => trade.InstrumentId);
+
+        foreach(var group in groupedTrades)
         {
-            totalQuantity += currentTrade.Quantity;
-            totalCost += currentTrade.Quantity * currentTrade.UnitPrice;
+            decimal totalQuantity = 0m;
+            decimal totalCost = 0m;
+
+            foreach(Trade trade in group)
+            {
+                totalQuantity += trade.Quantity;
+                totalCost += trade.Quantity * trade.UnitPrice;
+            }
+
+            decimal averageCost = totalCost / totalQuantity;
+
+            Position position = new Position
+            {
+                InstrumentId = group.Key,
+                Quantity = totalQuantity,
+                AverageCost = averageCost,
+                RealizedProfitLoss = 0m
+            };
+            positions.Add(position);
         }
 
-        decimal  averageCost = totalCost / totalQuantity;
 
-        Trade firstTrade = trades.First();
-        Position position = new Position 
-        { 
-            InstrumentId = firstTrade.InstrumentId,
-            Quantity = totalQuantity,
-            AverageCost = averageCost,
-            RealizedProfitLoss = 0m 
-        };
-        return new List<Position> { position };
+        return positions;
     }
 }
