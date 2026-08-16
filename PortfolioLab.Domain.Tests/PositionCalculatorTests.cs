@@ -5,9 +5,9 @@ namespace PortfolioLab.Domain.Tests
 {
     public class PositionCalculatorTests
     {
-        [Fact]
-
         // Arrange, Act, Assert pattern for unit testing
+
+        [Fact]
         public void CalculatePositions_SingleBuy_ReturnsExpectedPosition()
         {
             Trade trade = new Trade
