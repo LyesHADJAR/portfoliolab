@@ -6,12 +6,23 @@ public sealed class PositionCalculator
 {
     public IReadOnlyCollection<Position> CalculatePositions(List<Trade> trades)
     {
-        Trade trade = trades.Single();
+        decimal totalQuantity = 0m;
+        decimal totalCost = 0m;
+
+        foreach(Trade currentTrade in trades)
+        {
+            totalQuantity += currentTrade.Quantity;
+            totalCost += currentTrade.Quantity * currentTrade.UnitPrice;
+        }
+
+        decimal  averageCost = totalCost / totalQuantity;
+
+        Trade firstTrade = trades.First();
         Position position = new Position 
         { 
-            InstrumentId = trade.InstrumentId,
-            Quantity = trade.Quantity,
-            AverageCost = trade.UnitPrice,
+            InstrumentId = firstTrade.InstrumentId,
+            Quantity = totalQuantity,
+            AverageCost = averageCost,
             RealizedProfitLoss = 0m 
         };
         return new List<Position> { position };
