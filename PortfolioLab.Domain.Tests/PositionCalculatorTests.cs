@@ -319,5 +319,33 @@ namespace PortfolioLab.Domain.Tests
 
             Assert.Throws<InvalidOperationException>(() => calculator.CalculatePositions(new List<Trade> { buy, sell }));
         }
+
+        [Fact]
+        public void CalculatePositions_DuplicateTradeIds_ThrowsInvalidOperationException()
+        {
+            Trade firstTrade = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 100m,
+                UnitPrice = 150m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            Trade secondTrade = new Trade
+            {
+                TradeId = firstTrade.TradeId, // Using the same TradeId to create a duplicate
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 100m,
+                UnitPrice = 150m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            PositionCalculator calculator = new PositionCalculator();
+
+            Assert.Throws<InvalidOperationException>(() => calculator.CalculatePositions(new List<Trade> { firstTrade, secondTrade }));
+        }
     }
 }

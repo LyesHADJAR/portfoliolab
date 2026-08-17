@@ -8,6 +8,16 @@ public sealed class PositionCalculator
     {
         List<Position> positions = new List<Position>();
 
+        HashSet<Guid> seenTrades = new HashSet<Guid>();
+
+        foreach (Trade trade in trades)
+        {
+            if (!seenTrades.Add(trade.TradeId))
+            {
+                throw new InvalidOperationException($"Duplicate trade detected: {trade.TradeId}");
+            }
+        }
+
         var groupedTrades = trades.OrderBy(trade => trade.ExecutedAt).GroupBy(trade => trade.InstrumentId);
 
         foreach(var group in groupedTrades)
