@@ -25,11 +25,16 @@ public sealed class PositionCalculator
                 }
                 else if (trade.Side == TradeSide.Sell)
                 {
+                    if(trade.Quantity > totalQuantity)
+                    {
+                        throw new InvalidOperationException($"Cannot sell more than the current position for instrument {trade.InstrumentId}. Current position: {totalQuantity}, attempted to sell: {trade.Quantity}");
+                    }
+                    
                     decimal currentAverageCost = totalCost / totalQuantity;
                     realizedProfitLoss += (trade.UnitPrice - currentAverageCost) * trade.Quantity;
                     totalQuantity -= trade.Quantity;
                     totalCost -= trade.Quantity * currentAverageCost;
-
+                    
                 }
 
             }

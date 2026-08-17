@@ -291,5 +291,33 @@ namespace PortfolioLab.Domain.Tests
             Assert.Equal(150m, position.AverageCost);
             Assert.Equal(-1200m, position.RealizedProfitLoss);
         }
+
+        [Fact]
+        public void CalculatePositions_SellExceedsOwnedQuantity_ThrowsInvalidOperationException()
+        {
+            Trade buy = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 100m,
+                UnitPrice = 150m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            Trade sell = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Sell,
+                Quantity = 120m,
+                UnitPrice = 180m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            PositionCalculator calculator = new PositionCalculator();
+
+            Assert.Throws<InvalidOperationException>(() => calculator.CalculatePositions(new List<Trade> { buy, sell }));
+        }
     }
 }
