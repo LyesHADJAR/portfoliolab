@@ -16,6 +16,11 @@ public sealed class PositionCalculator
             {
                 throw new InvalidOperationException($"Duplicate trade detected: {trade.TradeId}");
             }
+
+            if(trade.Quantity <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(trade.Quantity), trade.Quantity, "Trade quantity must be positive.");
+            }
         }
 
         var groupedTrades = trades.OrderBy(trade => trade.ExecutedAt).GroupBy(trade => trade.InstrumentId);
