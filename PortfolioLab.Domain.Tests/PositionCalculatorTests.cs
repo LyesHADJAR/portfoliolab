@@ -143,5 +143,50 @@ namespace PortfolioLab.Domain.Tests
             Assert.Equal(150m, position.AverageCost);
             Assert.Equal(1200m, position.RealizedProfitLoss);
         }
+
+        [Fact]
+        public void CalculatePositions_MultipleBuysThenSell_ReturnsWeightedAverageAndRealizedProfitLoss()
+        {
+            Trade firstBuy = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 100m,
+                UnitPrice = 150m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            Trade secondBuy = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 50m,
+                UnitPrice = 180m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            Trade sell = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Sell,
+                Quantity = 30m,
+                UnitPrice = 200m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            PositionCalculator calculator = new PositionCalculator();
+
+            IReadOnlyCollection<Position> positions = calculator.CalculatePositions(new List<Trade> { firstBuy, secondBuy, sell });
+
+            Position position = Assert.Single(positions);
+
+            Assert.Equal("AAPL", position.InstrumentId);
+            Assert.Equal(120m, position.Quantity);
+            Assert.Equal(160m, position.AverageCost);
+            Assert.Equal(1200m, position.RealizedProfitLoss);
+        }
     }
 }
