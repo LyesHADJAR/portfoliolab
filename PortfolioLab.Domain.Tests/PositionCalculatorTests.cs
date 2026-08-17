@@ -415,5 +415,21 @@ namespace PortfolioLab.Domain.Tests
             PositionCalculator calculator = new PositionCalculator();
             Assert.Throws<ArgumentOutOfRangeException>(() => calculator.CalculatePositions(new List<Trade> { trade }));
         }
+
+        [Fact]
+        public void CalculatePositions_UnsupportedTradeSide_ThrowsInvalidOperationException()
+        {
+            Trade trade = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = (TradeSide)999,
+                Quantity = 50m,
+                UnitPrice = 100m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+            PositionCalculator calculator = new PositionCalculator();
+            Assert.Throws<InvalidOperationException>(() => calculator.CalculatePositions(new List<Trade> { trade }));
+        }
     }
 }
