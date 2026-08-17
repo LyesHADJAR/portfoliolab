@@ -34,7 +34,8 @@ public sealed class PositionCalculator
 
             }
 
-            decimal averageCost = totalCost / totalQuantity;
+            decimal averageCost = totalQuantity == 0m ? 0m : totalCost / totalQuantity;
+
 
             Position position = new Position
             {
