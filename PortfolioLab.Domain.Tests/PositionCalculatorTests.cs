@@ -257,5 +257,39 @@ namespace PortfolioLab.Domain.Tests
             Assert.Equal(0m, position.AverageCost);
             Assert.Equal(3000m, position.RealizedProfitLoss);
         }
+
+        [Fact]
+        public void CalculatePositions_SellAtLoss_ReturnsNegativeRealizedProfitLoss()
+        {
+            Trade buy = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 100m,
+                UnitPrice = 150m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            Trade sell = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Sell,
+                Quantity = 40m,
+                UnitPrice = 120m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            PositionCalculator calculator = new PositionCalculator();
+            IReadOnlyCollection<Position> positions = calculator.CalculatePositions(new List<Trade> { buy, sell });
+
+            Position position = Assert.Single(positions);
+
+            Assert.Equal("AAPL", position.InstrumentId);
+            Assert.Equal(60m, position.Quantity);
+            Assert.Equal(150m, position.AverageCost);
+            Assert.Equal(-1200m, position.RealizedProfitLoss);
+        }
     }
 }
