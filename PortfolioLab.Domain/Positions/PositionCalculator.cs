@@ -1,5 +1,4 @@
 ﻿using PortfolioLab.Domain.Trades;
-using System.Security;
 
 namespace PortfolioLab.Domain.Positions;
 
@@ -9,7 +8,7 @@ public sealed class PositionCalculator
     {
         List<Position> positions = new List<Position>();
 
-        var groupedTrades = trades.GroupBy(trade => trade.InstrumentId);
+        var groupedTrades = trades.OrderBy(trade => trade.ExecutedAt).GroupBy(trade => trade.InstrumentId);
 
         foreach(var group in groupedTrades)
         {
@@ -17,7 +16,7 @@ public sealed class PositionCalculator
             decimal totalCost = 0m;
             decimal realizedProfitLoss = 0m;
 
-            foreach(Trade trade in group)
+            foreach (Trade trade in group)
             {
                 if (trade.Side == TradeSide.Buy)
                 {

@@ -188,5 +188,40 @@ namespace PortfolioLab.Domain.Tests
             Assert.Equal(160m, position.AverageCost);
             Assert.Equal(1200m, position.RealizedProfitLoss);
         }
+
+        [Fact]
+        public void CalculatePositions_TradesProvidedOutOfOrder_ProcessesByExecutionTime()
+        {
+            Trade sell = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Sell,
+                Quantity = 30m,
+                UnitPrice = 200m,
+                ExecutedAt = new DateTimeOffset(2026, 8, 17, 11, 0, 0, TimeSpan.Zero) 
+            };
+
+            Trade buy = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 100m,
+                UnitPrice = 150m,
+                ExecutedAt = new DateTimeOffset(2026, 8, 17, 10, 0, 0, TimeSpan.Zero)  
+            };
+
+            PositionCalculator calculator = new PositionCalculator();
+
+            IReadOnlyCollection<Position> positions = calculator.CalculatePositions(new List<Trade> { sell, buy });  // Set buy before sell but pass them to the list in the wrong order
+
+            Position position = Assert.Single(positions);
+
+            Assert.Equal("AAPL", position.InstrumentId);
+            Assert.Equal(70m, position.Quantity);
+            Assert.Equal(150, position.AverageCost);
+            Assert.Equal(1500m, position.RealizedProfitLoss);
+        }
     }
 }
