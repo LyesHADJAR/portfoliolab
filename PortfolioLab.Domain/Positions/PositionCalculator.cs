@@ -17,9 +17,14 @@ public sealed class PositionCalculator
                 throw new InvalidOperationException($"Duplicate trade detected: {trade.TradeId}");
             }
 
-            if(trade.Quantity <= 0)
+            if (trade.Quantity <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(trade.Quantity), trade.Quantity, "Trade quantity must be positive.");
+            }
+
+            if (trade.UnitPrice <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(trade.UnitPrice), trade.UnitPrice, "Trade unit price must be positive.");
             }
         }
 

@@ -365,5 +365,55 @@ namespace PortfolioLab.Domain.Tests
 
             Assert.Throws<ArgumentOutOfRangeException>(() => calculator.CalculatePositions(new List<Trade> { trade }));
         }
+
+        [Fact]
+        public void CalculatePositions_NegativeQuantityTrade_ThrowsArgumentOutOfRangeException()
+        {
+            Trade trade = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = -50m,
+                UnitPrice = 100m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+
+            PositionCalculator calculator = new PositionCalculator();
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => calculator.CalculatePositions(new List<Trade> { trade }));
+        }
+
+        [Fact]
+        public void CalculatePositions_ZeroUnitPriceTrade_ThrowsArgumentOutOfRangeException()
+        {
+            Trade trade = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 50m,
+                UnitPrice = 0m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+            PositionCalculator calculator = new PositionCalculator();
+            Assert.Throws<ArgumentOutOfRangeException>(() => calculator.CalculatePositions(new List<Trade> { trade }));
+        }
+
+        [Fact]
+        public void CalculatePositions_NegativeUnitPriceTrade_ThrowsArgumentOutOfRangeException()
+        {
+            Trade trade = new Trade
+            {
+                TradeId = Guid.NewGuid(),
+                InstrumentId = "AAPL",
+                Side = TradeSide.Buy,
+                Quantity = 50m,
+                UnitPrice = -100m,
+                ExecutedAt = DateTimeOffset.UtcNow
+            };
+            PositionCalculator calculator = new PositionCalculator();
+            Assert.Throws<ArgumentOutOfRangeException>(() => calculator.CalculatePositions(new List<Trade> { trade }));
+        }
     }
 }
