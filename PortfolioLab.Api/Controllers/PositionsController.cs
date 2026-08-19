@@ -15,8 +15,13 @@ public class PositionsController : ControllerBase
         // map Position -> PositionResponse
         // return Ok(...) or BadRequest(new ProblemDetails { ... })
 
+        if (tradeRequests == null || !tradeRequests.Any())
+        {
+            return BadRequest(new ProblemDetails { Title = "Invalid trade data", Detail = "No valid trades provided." });
+        }
+
         IReadOnlyCollection<Trade> trades = tradeRequests.Select(MapToTrade).ToList();
-        
+
         try
         {
             PositionCalculator positionCalculator = new();

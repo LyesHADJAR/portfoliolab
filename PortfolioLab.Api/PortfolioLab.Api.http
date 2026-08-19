@@ -54,3 +54,8 @@ Content-Type: application/json
     "executedAt": "2026-08-19T11:00:00Z"
   }
 ]
+
+### Empty request
+POST {{PortfolioLab.Api_HostAddress}}/api/positions/calculate
+Content-Type: application/json
+[]
