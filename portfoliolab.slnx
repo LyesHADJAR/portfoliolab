@@ -2,4 +2,5 @@
   <Project Path="PortfolioLab.Api/PortfolioLab.Api.csproj" />
   <Project Path="PortfolioLab.Domain.Tests/PortfolioLab.Domain.Tests.csproj" />
   <Project Path="PortfolioLab.Domain/PortfolioLab.Domain.csproj" />
+  <Project Path="PortfolioLab.Infrastructure/PortfolioLab.Infrastructure.csproj" Id="35092d68-38ac-4cb9-830a-cceaa6c55310" />
 </Solution>
