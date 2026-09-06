@@ -3,6 +3,7 @@ using PortfolioLab.Api.Dtos;
 using PortfolioLab.Domain.Positions;
 using PortfolioLab.Domain.Trades;
 using PortfolioLab.Infrastructure.Persistence;
+using PortfolioLab.Api.Mappers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -32,19 +33,12 @@ public class PositionsController : ControllerBase
             return BadRequest(new ProblemDetails { Title = "Invalid trade data", Detail = "No valid trades provided." });
         }
 
-        IReadOnlyCollection<Trade> trades = tradeRequests.Select(MapToTrade).ToList();
+        IReadOnlyCollection<Trade> trades = tradeRequests.Select(TradeMapper.ToTrade).ToList();
 
         try
         {
             IReadOnlyCollection<Position> position = _positionCalculator.CalculatePositions(trades);
-
-            IReadOnlyCollection<PositionResponse> positionResponses = position.Select(p => new PositionResponse
-            {
-                InstrumentId = p.InstrumentId,
-                Quantity = p.Quantity,
-                AverageCost = p.AverageCost,
-                RealizedProfitLoss = p.RealizedProfitLoss
-            }).ToList();
+            IReadOnlyCollection<PositionResponse> positionResponses = PositionResponsesMapper.MapToPositionResponses(position);
             return Ok(positionResponses);
         }
         catch (ArgumentOutOfRangeException ex)
@@ -52,21 +46,34 @@ public class PositionsController : ControllerBase
             return BadRequest(new ProblemDetails { Title = "Invalid trade data", Detail = ex.Message });
         }
         catch (InvalidOperationException ex)
-        { 
-            return BadRequest(new ProblemDetails { Title = "Invalid trade sequence", Detail = ex.Message }); 
+        {
+            return BadRequest(new ProblemDetails { Title = "Invalid trade sequence", Detail = ex.Message });
         }
     }
 
-    private Trade MapToTrade(TradeRequest tradeRequest)
+    [HttpGet]
+    public async Task<IActionResult> CalculateAll()
     {
-        return new Trade
+        // load all stored trades from TradeRepository
+        // try/catch around PositionCalculator call
+        // return 200 and catch 400 with ProblemDetails if exception occurs
+
+        IReadOnlyCollection<Trade> trades = await _tradeRepository.GetAllAsync();
+        try
         {
-            TradeId = Guid.NewGuid(),
-            InstrumentId = tradeRequest.InstrumentId,
-            Side = tradeRequest.Side,
-            Quantity = tradeRequest.Quantity,
-            UnitPrice = tradeRequest.UnitPrice,
-            ExecutedAt = tradeRequest.ExecutedAt
-        };
+            IReadOnlyCollection<Position> position = _positionCalculator.CalculatePositions(trades);
+            IReadOnlyCollection<PositionResponse> positionResponses = PositionResponsesMapper.MapToPositionResponses(position);
+            return Ok(positionResponses);
+        }
+
+        catch (ArgumentOutOfRangeException ex)
+        {
+            return BadRequest(new ProblemDetails { Title = "Invalid trade data", Detail = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ProblemDetails { Title = "Invalid trade sequence", Detail = ex.Message });
+        }
     }
+
 }

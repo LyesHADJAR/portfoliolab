@@ -59,3 +59,30 @@ Content-Type: application/json
 POST {{PortfolioLab.Api_HostAddress}}/api/positions/calculate
 Content-Type: application/json
 []
+
+### Store a buy trade
+POST {{PortfolioLab.Api_HostAddress}}/api/trades
+Content-Type: application/json
+
+{
+  "instrumentId": "AAPL",
+  "side": "Buy",
+  "quantity": 100,
+  "unitPrice": 150,
+  "executedAt": "2026-08-19T10:00:00Z"
+}
+
+### Store a sell trade
+POST {{PortfolioLab.Api_HostAddress}}/api/trades
+Content-Type: application/json
+
+{
+  "instrumentId": "AAPL",
+  "side": "Sell",
+  "quantity": 40,
+  "unitPrice": 180,
+  "executedAt": "2026-08-19T11:00:00Z"
+}
+
+### Get positions from all stored trades
+GET {{PortfolioLab.Api_HostAddress}}/api/positions
